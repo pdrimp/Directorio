@@ -1,0 +1,45 @@
+﻿@page "/habitos/nueva"
+@page "/habitos/editar/{Id:int}"
+<PageTitle>Habitos</PageTitle>
+<h3>@_mensaje Habitos</h3>
+
+<EditForm Model="_habito" FormName="frmClasificacion" OnValidSubmit="GuardarPersona">
+    <DataAnnotationsValidator />
+    @*     <ValidationSummary /> *@
+    <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <InputText id="nombre" class="form-control" @bind-Value="_habito.Nombre" />
+        <ValidationMessage For="() => _habito.Nombre" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a type="button" class="btn btn-danger" href="/habitos">Cancelar</a>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // Propiedad para recibir el ID de la URL
+    private Habito _habito= new Habito(); // Inicializa la nueva persona
+    private string _mensaje = "Nueva ";
+
+    protected override void OnParametersSet()
+    {
+        if (Id > 0)
+        {
+            // Aquí puedes cargar la persona desde un servicio o API usando el ID
+            // Por ejemplo, simular la carga de una persona existente
+            _habito= new Habito() { Id = Id, Nombre = $"Hábito {Id}" };
+            _mensaje = "Editar ";
+        }
+    }
+
+    private void GuardarPersona()
+    {
+        // Aquí puedes agregar la lógica para guardar la persona
+        // Por ejemplo, enviar la información a un servicio o API
+        //Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+    }
+
+}

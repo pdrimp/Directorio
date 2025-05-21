@@ -1,0 +1,62 @@
+﻿@page "/personas/nueva"
+@page "/personas/editar/{Id:int}"
+<PageTitle>Personas</PageTitle>
+<h3>@_mensaje Persona</h3>
+
+<EditForm Model="_persona" FormName="frmPersona" OnValidSubmit="GuardarPersona">
+    <DataAnnotationsValidator />
+    @*     <ValidationSummary /> *@
+    <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <InputText id="nombre" class="form-control" @bind-Value="_persona.Nombre" />
+        <ValidationMessage For="() => _persona.Nombre" />
+    </div>
+    <div class="mb-3">
+        <label for="correo" class="form-label">Correo</label>
+        <InputText id="correo" class="form-control" @bind-Value="_persona.Correo" />
+        <ValidationMessage For="() => _persona.Correo" />
+    </div>
+    <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <InputText id="nombre" class="form-control" @bind-Value="_persona.Telefono" />
+        <ValidationMessage For="() => _persona.Telefono" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a type="button" class="btn btn-danger" href="/">Cancelar</a>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // Propiedad para recibir el ID de la URL
+    private Persona _persona = new Persona(); // Inicializa la nueva persona
+    private string _mensaje = "Nueva ";
+
+    protected override void OnParametersSet()
+    {
+        if (Id > 0)
+        {
+            // Aquí puedes cargar la persona desde un servicio o API usando el ID
+            // Por ejemplo, simular la carga de una persona existente
+            _persona = new Persona() { Id = Id, Nombre = $"Persona {Id}", Correo = $"correo{Id}@ucol", Telefono = "1234567890" };
+            _mensaje = "Editar ";
+        }
+    }
+
+    private void GuardarPersona()
+    {
+        // Aquí puedes agregar la lógica para guardar la persona
+        // Por ejemplo, enviar la información a un servicio o API
+        Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+    }
+
+    private void Cancelar()
+    {
+        // Aquí puedes agregar la lógica para cancelar la operación
+        // Por ejemplo, redirigir a otra página o limpiar el formulario
+        Console.WriteLine("Operación cancelada");
+    }
+
+}

@@ -1,0 +1,45 @@
+﻿@page "/clasificaciones/nueva"
+@page "/clasificaciones/editar/{Id:int}"
+<PageTitle>Clasificaciones</PageTitle>
+<h3>@_mensaje Clasificación</h3>
+
+<EditForm Model="_clasificacion" FormName="frmClasificacion" OnValidSubmit="GuardarPersona">
+    <DataAnnotationsValidator />
+    @*     <ValidationSummary /> *@
+    <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <InputText id="nombre" class="form-control" @bind-Value="_clasificacion.Nombre" />
+        <ValidationMessage For="() => _clasificacion.Nombre" />
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a type="button" class="btn btn-danger" href="/clasificaciones">Cancelar</a>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; } // Propiedad para recibir el ID de la URL
+    private Clasificacion _clasificacion = new Clasificacion(); // Inicializa la nueva persona
+    private string _mensaje = "Nueva ";
+
+    protected override void OnParametersSet()
+    {
+        if (Id > 0)
+        {
+            // Aquí puedes cargar la persona desde un servicio o API usando el ID
+            // Por ejemplo, simular la carga de una persona existente
+            _clasificacion= new Clasificacion() { Id = Id, Nombre = $"Clasificacioón {Id}" };
+            _mensaje = "Editar ";
+        }
+    }
+
+    private void GuardarPersona()
+    {
+        // Aquí puedes agregar la lógica para guardar la persona
+        // Por ejemplo, enviar la información a un servicio o API
+        //Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+    }
+
+}
