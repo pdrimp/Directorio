@@ -1,5 +1,6 @@
 ﻿@page "/habitos"
 <PageTitle>Habitos</PageTitle>
+@inject IRepositorioHabitos _repositorioHabitos
 @inject NavigationManager _navigationManager
 <PageTitle>Hábitos</PageTitle>
 
@@ -49,12 +50,12 @@ else
 }
 
 @code {
-    private List<Habito> _habitos = new List<Habito>
-                                            {
-                                                new Habito { Id=1, Nombre = "Hábito UNO"},
-                                                new Habito { Id=2, Nombre = "Hábito DOS"},
-                                                new Habito { Id=3, Nombre = "Hábito TRES"}
-                                            };
+    private List<Habito>? _habitos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _habitos = await _repositorioHabitos.GetAll();
+    }
 
     private void Editar(int id)
     {

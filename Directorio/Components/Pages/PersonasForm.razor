@@ -1,5 +1,9 @@
 ﻿@page "/personas/nueva"
 @page "/personas/editar/{Id:int}"
+@inject IRepositorioPersonas _repositorioPersonas
+@inject IRepositorioClasificaciones _repositorioClasificaciones
+@inject IRepositorioHabitos _repositorioHabitos
+@inject NavigationManager _navigationManager
 <PageTitle>Personas</PageTitle>
 <h3>@_mensaje Persona</h3>
 
@@ -21,6 +25,30 @@
         <InputText id="nombre" class="form-control" @bind-Value="_persona.Telefono" />
         <ValidationMessage For="() => _persona.Telefono" />
     </div>
+
+    <div class="mb-3">
+        <label for="txtClasificacion" class="form-label">Clasificación</label>
+        <InputSelect class="form-select" id="txtClasificacion" @bind-Value="_persona.ClasificacionId">
+            <option value="">Seleccione...</option>
+            @foreach (var clasificacion in _clasificaciones)
+            {
+                <option value="@clasificacion.Id">@clasificacion.Nombre</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="() => _persona.ClasificacionId" />
+    </div>
+    <div class="mb-3">
+        <label for="txtHabitos" class="form-label">Hábitos</label>
+        <select multiple class="form-select" id="txtHabitos" @onchange="OnSelectionChanged">
+            @foreach (var habito in _habitos)
+            {
+                <option value="@habito.Id" selected="@_habitosIdSeleccionados.Contains(habito.Id)">
+                    @habito.Nombre
+                </option>
+            }
+        </select>
+    </div>
+
     <div class="mb-3">
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a type="button" class="btn btn-danger" href="/">Cancelar</a>
@@ -33,23 +61,50 @@
     public int Id { get; set; } // Propiedad para recibir el ID de la URL
     private Persona _persona = new Persona(); // Inicializa la nueva persona
     private string _mensaje = "Nueva ";
+    private List<Clasificacion> _clasificaciones = new();
+    private List<Habito> _habitos = new();
+    private List<int> _habitosIdSeleccionados = new();
 
-    protected override void OnParametersSet()
+    protected override async Task OnInitializedAsync()
     {
+        _clasificaciones = await _repositorioClasificaciones.GetAll();
+        _habitos = await _repositorioHabitos.GetAll();
+
         if (Id > 0)
         {
-            // Aquí puedes cargar la persona desde un servicio o API usando el ID
-            // Por ejemplo, simular la carga de una persona existente
-            _persona = new Persona() { Id = Id, Nombre = $"Persona {Id}", Correo = $"correo{Id}@ucol", Telefono = "1234567890" };
+            _persona = await _repositorioPersonas.Get(Id);
             _mensaje = "Editar ";
+            if (_persona.Habitos != null && _persona.Habitos.Count > 0)
+            {
+                _habitosIdSeleccionados = _persona.Habitos.Select(h => h.Id).ToList();
+            }
+        }
+        else
+        {
+            _mensaje = "Nueva ";
         }
     }
 
-    private void GuardarPersona()
+    private async Task GuardarPersona()
     {
-        // Aquí puedes agregar la lógica para guardar la persona
-        // Por ejemplo, enviar la información a un servicio o API
-        Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+        if (_habitosIdSeleccionados.Count > 0)
+        {
+            _persona.Habitos = new List<Habito>();
+            foreach (var id in _habitosIdSeleccionados)
+            {
+                var habito = await _repositorioHabitos.Get(id);
+                _persona.Habitos.Add(habito);
+            }
+        }
+        if (Id > 0)
+        {
+            await _repositorioPersonas.Update(_persona);
+        }
+        else
+        {
+            await _repositorioPersonas.Add(_persona);
+        }
+        _navigationManager.NavigateTo("/");
     }
 
     private void Cancelar()
@@ -57,6 +112,15 @@
         // Aquí puedes agregar la lógica para cancelar la operación
         // Por ejemplo, redirigir a otra página o limpiar el formulario
         Console.WriteLine("Operación cancelada");
+    }
+
+    private void OnSelectionChanged(ChangeEventArgs e)
+    {
+        var selectedOptions = (e.Value as IEnumerable<string>) ?? new[] { e.Value?.ToString() };
+        _habitosIdSeleccionados = selectedOptions
+            .Where(id => int.TryParse(id, out _))
+            .Select(int.Parse)
+            .ToList();
     }
 
 }

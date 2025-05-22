@@ -1,6 +1,7 @@
 ﻿@page "/clasificaciones"
 <PageTitle>Clasificaciones</PageTitle>
 @inject NavigationManager _navigationManager
+@inject IRepositorioClasificaciones _repositorioClasificaciones
 <PageTitle>Clasificaciones</PageTitle>
 
 <h1>Clasificaciones</h1>
@@ -49,12 +50,12 @@ else
 }
 
 @code {
-    private List<Clasificacion> _clasificaciones = new List<Clasificacion>
-                                            {
-                                                new Clasificacion { Id=1, Nombre = "Clasificación UNO"},
-                                                new Clasificacion { Id=2, Nombre = "Clasificación DOS"},
-                                                new Clasificacion { Id=3, Nombre = "Clasificación TRES"}
-                                            };
+    private List<Clasificacion>? _clasificaciones;
+
+    override protected async Task OnInitializedAsync()
+    {
+        _clasificaciones = await _repositorioClasificaciones.GetAll();
+    }
 
     private void Editar(int id)
     {

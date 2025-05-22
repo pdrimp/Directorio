@@ -1,5 +1,7 @@
 ﻿@page "/habitos/nueva"
 @page "/habitos/editar/{Id:int}"
+@inject NavigationManager _navigationManager
+@inject IRepositorioHabitos _repositorioHabitos
 <PageTitle>Habitos</PageTitle>
 <h3>@_mensaje Habitos</h3>
 
@@ -21,25 +23,31 @@
 @code {
     [Parameter]
     public int Id { get; set; } // Propiedad para recibir el ID de la URL
-    private Habito _habito= new Habito(); // Inicializa la nueva persona
+    private Habito _habito = new Habito(); // Inicializa la nueva persona
     private string _mensaje = "Nueva ";
 
-    protected override void OnParametersSet()
+
+    protected override async Task OnInitializedAsync()
     {
-        if (Id > 0)
+        if (Id > 0) // Si el ID es mayor que 0, significa que estamos editando
         {
-            // Aquí puedes cargar la persona desde un servicio o API usando el ID
-            // Por ejemplo, simular la carga de una persona existente
-            _habito= new Habito() { Id = Id, Nombre = $"Hábito {Id}" };
             _mensaje = "Editar ";
+            _habito = await _repositorioHabitos.Get(Id); // Obtiene la persona por ID
         }
     }
 
-    private void GuardarPersona()
+
+    private async Task GuardarPersona()
     {
-        // Aquí puedes agregar la lógica para guardar la persona
-        // Por ejemplo, enviar la información a un servicio o API
-        //Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+        if (Id > 0) // Si el ID es mayor que 0, significa que estamos editando
+        {
+            await _repositorioHabitos.Update(_habito); // Actualiza la persona
+        }
+        else // Si el ID es 0, significa que estamos creando una nueva persona
+        {
+            await _repositorioHabitos.Add(_habito); // Crea la nueva persona
+        }
+        _navigationManager.NavigateTo("/habitos"); // Redirige a la lista de personas después de guardar
     }
 
 }

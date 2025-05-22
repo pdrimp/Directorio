@@ -1,9 +1,11 @@
 ﻿@page "/clasificaciones/nueva"
 @page "/clasificaciones/editar/{Id:int}"
+@inject IRepositorioClasificaciones _repositorioClasificaciones
+@inject NavigationManager _navigationManager
 <PageTitle>Clasificaciones</PageTitle>
 <h3>@_mensaje Clasificación</h3>
 
-<EditForm Model="_clasificacion" FormName="frmClasificacion" OnValidSubmit="GuardarPersona">
+<EditForm Model="_clasificacion" FormName="frmClasificacion" OnValidSubmit="GuardarClasificacion">
     <DataAnnotationsValidator />
     @*     <ValidationSummary /> *@
     <div class="mb-3">
@@ -24,22 +26,28 @@
     private Clasificacion _clasificacion = new Clasificacion(); // Inicializa la nueva persona
     private string _mensaje = "Nueva ";
 
-    protected override void OnParametersSet()
+
+    protected override async Task OnInitializedAsync()
     {
         if (Id > 0)
         {
-            // Aquí puedes cargar la persona desde un servicio o API usando el ID
-            // Por ejemplo, simular la carga de una persona existente
-            _clasificacion= new Clasificacion() { Id = Id, Nombre = $"Clasificacioón {Id}" };
+            _clasificacion = await _repositorioClasificaciones.Get(Id);
             _mensaje = "Editar ";
         }
     }
 
-    private void GuardarPersona()
+
+    private async Task GuardarClasificacion()
     {
-        // Aquí puedes agregar la lógica para guardar la persona
-        // Por ejemplo, enviar la información a un servicio o API
-        //Console.WriteLine($"Guardando persona: {_persona.Nombre}, {_persona.Correo}, {_persona.Telefono}");
+        if (Id > 0)
+        {
+            await _repositorioClasificaciones.Update(_clasificacion);
+        }
+        else
+        {
+            await _repositorioClasificaciones.Add(_clasificacion);
+        }
+        _navigationManager.NavigateTo("/clasificaciones");
     }
 
 }

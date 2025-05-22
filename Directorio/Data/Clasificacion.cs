@@ -8,5 +8,7 @@ namespace Directorio.Data
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [StringLength(50, ErrorMessage = "El nombre no puede exceder los 50 caracteres")]
         public string? Nombre { get; set; }
+
+        virtual public List<Persona>? Personas { get; set; } = null!;
     }
 }

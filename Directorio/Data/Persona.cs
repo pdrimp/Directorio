@@ -15,5 +15,11 @@ namespace Directorio.Data
         [EmailAddress(ErrorMessage = "El correo no es válido")]
         [StringLength(100, ErrorMessage = "El correo no puede exceder los 100 caracteres")]
         public string? Correo { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "La clasificación es obligatoria")]
+        public int ClasificacionId { get; set; }
+        virtual public Clasificacion? Clasificacion { get; set; }
+
+        public List<Habito>? Habitos { get; set; }
     }
 }

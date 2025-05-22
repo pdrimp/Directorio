@@ -1,10 +1,19 @@
 using Directorio.Components;
+using Directorio.Data;
+using Directorio.Repositorios;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContext<BDContexto>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IRepositorioPersonas, RepositorioPersonas>();
+builder.Services.AddScoped<IRepositorioClasificaciones, RepositorioClasificaciones>();
+builder.Services.AddScoped<IRepositorioHabitos, RepositorioHabitos>();
 
 var app = builder.Build();
 
